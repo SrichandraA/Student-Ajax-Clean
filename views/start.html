@@ -26,14 +26,14 @@
   <script type="text/javascript">
     $(function(){
       $("body").on("click","#deletebutton",function(){
-        var value1 = $(this).val();
-        var data2 = {};
-        data2.title = value1;
+        var value = $(this).val();
+        var data = {};
+        data.title = value;
         $.ajax({
           url: '/deletestudent',
           // dataType: "jsonp",
           type: 'POST',
-          data: JSON.stringify(data2),
+          data: JSON.stringify(data),
           contentType: 'application/json',
           success: function (data) {
             console.log("Data:"+data);
@@ -48,21 +48,21 @@
 
       $("body").on("click","#editbtn",function(){
         var value = $(this).val();
-        var data1 = {};
-        data1.title = value;
+        var data = {};
+        data.title = value;
         $.ajax({
           url: '/editstudent',
           type: 'POST',
-          data: JSON.stringify(data1),
+          data: JSON.stringify(data),
           contentType: 'application/json',
           success: function (data) {
-            var dataref = JSON.parse(data);
-            console.log(dataref[0].name);
+            data = JSON.parse(data);
+            console.log(data[0].name);
             $('#myModal2').modal('show');
-            $('#nameid2').val(dataref[0].name);
-            $('#sectionid2').val(dataref[0].section);
-            $('#emailid2').val(dataref[0].email);
-            $('#phoneid2').val(dataref[0].phone);
+            $('#nameid2').val(data[0].name);
+            $('#sectionid2').val(data[0].section);
+            $('#emailid2').val(data[0].email);
+            $('#phoneid2').val(data[0].phone);
             $("#nameid2").prop("readonly", true);
             $('#myform2').on('submit', function (e) {
               e.preventDefault();
@@ -94,8 +94,11 @@
         var variable = $(this).attr("id");
         var last = unidata.length;
         var total = Math.ceil(last / 5);
+        var l = 0,
+        j = 0,
+        k = 0,
+        content;
         console.log(total);
-        var l = 0,j = 0,k = 0;
 
         if((variable >= 1)&&(variable != total)){
           l = (variable - 1) * 5;
@@ -125,8 +128,7 @@
           }
         }
 //$('#table').html(content);
-
-        var content = "<table class='table table-bordered'><thead class='thead-inverse'><tr><th>NAME</th><th>SECTION</th><th>EMAIL</th><th>PHONE</th><th>EDIT</th><th>DELETE</th></tr></thead><tbody>"
+        content = "<table class='table table-bordered'><thead class='thead-inverse'><tr><th>NAME</th><th>SECTION</th><th>EMAIL</th><th>PHONE</th><th>EDIT</th><th>DELETE</th></tr></thead><tbody>"
         for(k = l; k < j; k ++){
           content += '<tr><td>' +  unidata[k].name + '</td><td>' +  unidata[k].section + '</td><td>' +  unidata[k].email + '</td><td>' +  unidata[k].phone + '</td><td><button id="editbtn" type="submit"  value="' +  unidata[k].name + '"  class="btn btn-primary btn-sm" >Edit</button></td><td><button type="submit" id="deletebutton" value="' +  unidata[k].name + '" class="btn btn-primary btn-sm" >Delete</button></td></tr>';
         }
@@ -134,24 +136,26 @@
         $('#table').html(content);
       });
 
-      var unidata,current=1;
-        $.ajax({
+      var unidata,
+      current = 1;
+      $.ajax({
           url: '/getlist',
           type: 'GET',
-          success: function (dataa) {
-            var data = JSON.parse(dataa);
+          success: function (data) {
+            data = JSON.parse(data);
             unidata = data;
             var len = Math.ceil(data.length / 5);
-            console.log(data[0].name);
             var i = 0;
-            var pager;
+            var pager,
+            content;
+            console.log(data[0].name);
             pager = '<li class="active page-item"><span ><a class="page-link" id="1" >1</a> <span class="sr-only">(current)</span></span></li>';
             if(len > 1){
               for (i = 2;i <= len;i ++){
                 pager += '<li class="page-item"><a class="page-link" id="'+i+'" >'+i+'</a></li>';
               }
             }
-            var content = "<table class='table table-bordered'><thead class='thead-inverse'><tr><th>NAME</th><th>SECTION</th><th>EMAIL</th><th>PHONE</th><th>EDIT</th><th>DELETE</th></tr></thead><tbody>"
+            content = "<table class='table table-bordered'><thead class='thead-inverse'><tr><th>NAME</th><th>SECTION</th><th>EMAIL</th><th>PHONE</th><th>EDIT</th><th>DELETE</th></tr></thead><tbody>"
             for(i = 0; i < 5; i ++){
               content += '<tr><td>' +  data[i].name + '</td><td>' +  data[i].section + '</td><td>' +  data[i].email + '</td><td>' +  data[i].phone + '</td><td><button id="editbtn" type="submit"  value="' +  data[i].name + '"  class="btn btn-primary btn-sm" >Edit</button></td><td><button type="submit" id="deletebutton" value="' +  data[i].name + '" class="btn btn-primary btn-sm" >Delete</button></td></tr>';
             }
